@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from todo_sub.db_connect import engine, create_database_table, get_session
-from todo_sub.models import Todo
+from todo_sub.models import Todo, TodoUpdate
 
 from sqlmodel import Session, select
 from fastapi import HTTPException
@@ -68,7 +68,23 @@ def update_todo(title: str, todo: Todo, session: Session = Depends(get_session))
     
     
 @app.patch("/update_todo_value/{title}") #Update single column value
-def update_todo_value(title: str, todo: Todo, session: Session = Depends(get_session)):
+def update_todo_value(title: str, todo_update: TodoUpdate , session: Session = Depends(get_session)):
     existing_todo = session.exec(select(Todo).where(Todo.title == title)).first()
     if not existing_todo:
         raise HTTPException(status_code=404, detail="Todo not found")
+    print("Todo in database", existing_todo)
+    print("Todo from Client", todo_update)
+    
+    todo_update_dict = todo_update.model_dump(exclude_unset=True) 
+    print("Todo update dict", todo_update_dict)
+    
+    for key, value in todo_update_dict.items():
+        setattr(existing_todo, key, value)
+    
+    print("Updated Todo", existing_todo)
+    
+    session.add(existing_todo)
+    session.commit()
+    session.refresh(existing_todo)
+    
+    return existing_todo

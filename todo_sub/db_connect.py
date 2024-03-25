@@ -4,10 +4,11 @@ import os
 
 _ : bool = load_dotenv(find_dotenv())
 CONN_STRING = os.environ.get("CONN_STRING")
+
 print(CONN_STRING)
 
 def create_engine_conn():
-    engine = create_engine(CONN_STRING)   #echo=True
+    engine = create_engine(CONN_STRING, echo=True)
     print("Engine created")
     return engine
 
