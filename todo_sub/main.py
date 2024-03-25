@@ -72,5 +72,3 @@ def update_todo_value(title: str, todo: Todo, session: Session = Depends(get_ses
     existing_todo = session.exec(select(Todo).where(Todo.title == title)).first()
     if not existing_todo:
         raise HTTPException(status_code=404, detail="Todo not found")
-    print("Existing TODO", existing_todo)
-    print("User entered TODO", todo)
